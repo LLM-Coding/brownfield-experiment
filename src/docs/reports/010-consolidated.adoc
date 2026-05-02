@@ -1,5 +1,4 @@
 = Socratic Code Theory Recovery: Experiment Report
-
 Ralf D. Müller
 2026-05-02
 :toc: left
