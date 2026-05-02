@@ -3,11 +3,11 @@ outputPath = 'build'
 inputPath = 'src/docs'
 
 inputFiles = [
-    [file: 'reports/00-consolidated.adoc',              formats: ['html']],
-    [file: 'reports/experiment-1a-direct.adoc',          formats: ['html']],
-    [file: 'reports/experiment-1c-socratic.adoc',        formats: ['html']],
-    [file: 'reports/experiment-2-twophase.adoc',         formats: ['html']],
-    [file: 'reports/experiment-fair-comparison.adoc',     formats: ['html']],
+    [file: 'reports/010-consolidated.adoc',              formats: ['html']],
+    [file: 'reports/020-experiment-1a-direct.adoc',      formats: ['html']],
+    [file: 'reports/030-experiment-1c-socratic.adoc',    formats: ['html']],
+    [file: 'reports/040-experiment-2-twophase.adoc',     formats: ['html']],
+    [file: 'reports/050-experiment-fair-comparison.adoc', formats: ['html']],
 ]
 
 imageDirs = ['images/.']

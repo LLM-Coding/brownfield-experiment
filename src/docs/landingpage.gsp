@@ -10,7 +10,7 @@
                 A controlled experiment measuring what LLMs can and cannot recover from source code alone. We deleted all documentation from a well-documented project, asked an LLM to reconstruct it, and compared the output against the originals.
             </p>
             <p style="margin-top: 1.5rem;">
-                <a href="reports/00-consolidated.html" class="btn btn-light btn-lg" style="font-weight: 600;">
+                <a href="reports/010-consolidated.html" class="btn btn-light btn-lg" style="font-weight: 600;">
                     Read the Report
                 </a>
                 <a href="https://github.com/LLM-Coding/brownfield-experiment" class="btn btn-outline-light btn-lg" style="margin-left: 0.5rem;">
@@ -77,24 +77,24 @@
                         <td><strong>Direct</strong></td>
                         <td>17.5/30</td>
                         <td>Most detailed functional requirements, inline threat model</td>
-                        <td><a href="reports/experiment-1a-direct.html">Detailed report</a></td>
+                        <td><a href="reports/020-experiment-1a-direct.html">Detailed report</a></td>
                     </tr>
                     <tr>
                         <td><strong>Socratic</strong></td>
                         <td>18.5/30</td>
                         <td>Only version with correct quality goal priorities, most efficient (21% of original)</td>
-                        <td><a href="reports/experiment-1c-socratic.html">Detailed report</a></td>
+                        <td><a href="reports/030-experiment-1c-socratic.html">Detailed report</a></td>
                     </tr>
                     <tr>
                         <td><strong>Two-Phase</strong></td>
                         <td>22/30</td>
                         <td>All 5 ADR topics correct, highest traceability (50 team-answer markers)</td>
-                        <td><a href="reports/experiment-2-twophase.html">Detailed report</a></td>
+                        <td><a href="reports/040-experiment-2-twophase.html">Detailed report</a></td>
                     </tr>
                 </tbody>
             </table>
             <p class="text-center">
-                <a href="reports/experiment-fair-comparison.html" class="btn btn-outline-primary">Fair Comparison (all with team answers)</a>
+                <a href="reports/050-experiment-fair-comparison.html" class="btn btn-outline-primary">Fair Comparison (all with team answers)</a>
             </p>
         </div>
 
