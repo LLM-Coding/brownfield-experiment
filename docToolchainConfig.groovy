@@ -3,11 +3,11 @@ outputPath = 'build'
 inputPath = 'src/docs'
 
 inputFiles = [
-    [file: 'report.adoc',                      formats: ['html']],
-    [file: 'experiment-1a-direct.adoc',         formats: ['html']],
-    [file: 'experiment-1c-socratic.adoc',       formats: ['html']],
-    [file: 'experiment-2-twophase.adoc',        formats: ['html']],
-    [file: 'experiment-fair-comparison.adoc',    formats: ['html']],
+    [file: 'reports/00-consolidated.adoc',              formats: ['html']],
+    [file: 'reports/experiment-1a-direct.adoc',          formats: ['html']],
+    [file: 'reports/experiment-1c-socratic.adoc',        formats: ['html']],
+    [file: 'reports/experiment-2-twophase.adoc',         formats: ['html']],
+    [file: 'reports/experiment-fair-comparison.adoc',     formats: ['html']],
 ]
 
 imageDirs = ['images/.']
@@ -18,9 +18,10 @@ microsite.with {
     contextPath = '/'
     host = 'https://llm-coding.github.io/brownfield-experiment'
     title = 'Brownfield Experiment'
+    landingPage = 'landingpage.gsp'
     footerGithub = 'https://github.com/LLM-Coding/brownfield-experiment'
     footerText = '<small class="text-white">built with <a href="https://doctoolchain.org">docToolchain</a></small>'
     issueUrl = 'https://github.com/LLM-Coding/brownfield-experiment/issues/new'
     gitRepoUrl = 'https://github.com/LLM-Coding/brownfield-experiment/edit/main/src/docs'
-    menu = ['report':'Report', 'experiment-1a-direct':'Direct (1a)', 'experiment-1c-socratic':'Socratic (1c)', 'experiment-2-twophase':'Two-Phase', 'experiment-fair-comparison':'Fair Comparison']
+    menu = ['reports':'Reports', 'prompts':'Prompts']
 }
