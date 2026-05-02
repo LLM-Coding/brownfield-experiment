@@ -29,4 +29,4 @@ jobs:
       - name: Run AsciiDoc Linter
         run: |
           echo "Linting AsciiDoc files..."
-          asciidoc-linter src/docs/*.adoc --format console
+          find src/docs -name '*.adoc' | xargs asciidoc-linter --format console
