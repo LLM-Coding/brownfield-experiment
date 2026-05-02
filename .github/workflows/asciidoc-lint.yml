@@ -1,0 +1,32 @@
+name: AsciiDoc Linter
+
+on:
+  pull_request:
+    paths:
+      - 'src/docs/**/*.adoc'
+  push:
+    branches: [main]
+    paths:
+      - 'src/docs/**/*.adoc'
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install AsciiDoc Linter
+        run: |
+          pip install git+https://github.com/doctoolchain/asciidoc-linter.git
+
+      - name: Run AsciiDoc Linter
+        run: |
+          echo "Linting AsciiDoc files..."
+          asciidoc-linter src/docs/*.adoc --format console
