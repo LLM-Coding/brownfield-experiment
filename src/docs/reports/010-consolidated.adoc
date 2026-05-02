@@ -1,4 +1,5 @@
 = Socratic Code Theory Recovery: Experiment Report
+
 Ralf D. Müller
 2026-05-02
 :toc: left
@@ -180,7 +181,7 @@ Based on the experiments, the recommended workflow for preparing Brownfield proj
 ----
 Phase 0: Scope bounded contexts (Martinelli / DDD)
 Phase 1: Socratic Code Theory Recovery (Question Tree)
-         -> Open Questions handoff to team
+         then Open Questions handoff to team
 Phase 2: Team answers (typically 10-15 questions, routed by role)
 Phase 3: Synthesize documentation (Q-ID traceability + team answer markers)
 Phase 4: Establish baseline tests from synthesized Use Cases
