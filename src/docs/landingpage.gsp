@@ -95,6 +95,7 @@
             </table>
             <p class="text-center">
                 <a href="reports/050-experiment-fair-comparison.html" class="btn btn-outline-primary">Fair Comparison (all with team answers)</a>
+                <a href="semantic-diff.html" class="btn btn-outline-secondary" style="margin-left: 0.5rem;">Semantic Traceability Matrix</a>
             </p>
         </div>
 
