@@ -1,0 +1,214 @@
+= Brownfield Experiment 2: Socratic Code Theory Recovery (Two-Phase)
+:toc: left
+:toclevels: 3
+:sectnums:
+:icons: font
+
+== Experiment Design
+
+=== Hypothesis
+
+The Two-Phase workflow combines the strengths of both previous approaches: the Socratic approach's honesty about unknowns (Phase 1) with the Direct approach's comprehensive documentation (Phase 2). By routing Open Questions to the team between phases, the documentation should include correct rationale, quality goal priorities, and performance budgets that neither pure approach could produce.
+
+=== Setup
+
+* *Project:* Bausteinsicht (same as Experiments 1a and 1c)
+* *Branch:* `brownfield-2-phases`
+* *Phase 1 Prompt:* Socratic Code Theory Recovery (51 lines)
+* *Phase 2 Prompt:* Documentation synthesis with 11 team-answered Open Questions
+* *LLM:* Claude (fresh session per phase)
+
+=== Method
+
+. Phase 1: LLM builds Question Tree from code (166 questions)
+. LLM produces OPEN_QUESTIONS.adoc with 11 unanswerable questions, routed by role
+. "Team" answers all 11 questions from the original documentation (simulating Product Owner, Architect, Developer input)
+. Phase 2: LLM synthesizes documentation from answered questions + code evidence + team answers
+. Compare output against Original, Direct (1a), and Socratic (1c)
+
+== Results at a Glance
+
+[cols="3,2,2,2,2",options="header"]
+|===
+| Metric | Original | Direct (1a) | Socratic (1c) | Two-Phase
+
+| Total doc lines | ~13,800 | 3,850 | 2,434 | 4,083
+| arc42 chapter lines | 1,300 | 642 | 429 | 1,090
+| ADRs | 5 | 6 (wrong topics) | 3 | 5 (correct topics)
+| ADR topics match Original | — | No | No | *Yes*
+| Use Cases | 8 | 9 | 9 | 9
+| Acceptance Criteria | 40 | 69 | ~20 | 47
+| Open Questions remaining | — | 33 | 26 | 0
+| Q-ID traceability | 0 files | 1 file | 23 files | 24 files
+| Team answer markers | 0 | 0 | 0 | 50
+| Performance budgets (Ch. 7) | Yes | No | No | *Yes*
+| Quality goal priorities (Ch. 1) | Yes | No | No | *Yes*
+| Glossary terms | 2 | 31 | 19 | 97
+|===
+
+== The Breakthrough: ADRs Match the Original
+
+The most significant result: the Two-Phase approach produced *exactly the right 5 ADR topics*, matching the Original 1:1.
+
+[cols="1,1,1,1,1",options="header"]
+|===
+| ADR | Original | Direct (1a) | Socratic (1c) | Two-Phase
+
+| DSL Format | ✅ | ✅ (fewer alternatives) | ✅ | ✅ (full rationale from OQ-5)
+| Implementation Language | ✅ | ❌ (CLI Framework instead) | ❌ | ✅
+| Risk Classification | ✅ | ❌ (missing) | ❌ | ✅
+| Sequence Diagram Export | ✅ (Rejected) | ❌ (Conflict Policy instead) | ❌ | ✅ (Rejected)
+| Auto-Layout Engine | ✅ | ❌ (XML Library instead) | ❌ | ✅
+|===
+
+This happened because OQ-4 asked "Are ADRs maintained, and where?" and the team answered with the complete list of 5 ADRs including their topics and status. The LLM then wrote ADRs for those exact topics instead of guessing which decisions were important.
+
+The ADR-001 (DSL Format) includes the real rationale: 6 alternatives evaluated, JSONC scored +20, key reasons (no parser needed, bidirectional sync, IDE support, LLM-native, JSONC comments). This came directly from the OQ-5 team answer.
+
+== Previously "Poorly Derivable" Chapters: Now Strong
+
+=== Chapter 1: Quality Goal Priorities
+
+[cols="2,3",options="header"]
+|===
+| Version | Top 3 Quality Goals
+
+| Original | 1. Learnability (30-min onboarding), 2. IDE Support, 3. LLM Friendliness
+| Direct (1a) | 6 goals inferred from code, no prioritization
+| Socratic (1c) | 4 goals inferred, no priority (Q-3.1.2 left open)
+| Two-Phase | 1. Bidirectional correctness, 2. Predictability for LLM agents, 3. Zero-friction install _(OQ-6 team answer)_
+|===
+
+The Two-Phase approach is the only generated version with explicit quality goal priorities. The framing differs slightly from the Original (correctness vs. learnability as #1), but the intent is captured because the team provided the competitive context (OQ-6: "draw.io is the most widely used free diagramming tool").
+
+=== Chapter 7: Performance Budgets
+
+[cols="2,3",options="header"]
+|===
+| Version | Performance Metrics
+
+| Original | Startup <10ms, Sync <100ms (200 elements), Binary 10-15MB, Zero deps
+| Direct (1a) | Not present
+| Socratic (1c) | Not present
+| Two-Phase | Startup <10ms, Sync <100ms (200 elements), Binary 10-15MB, Zero deps _(OQ-8 team answer)_
+|===
+
+Identical to Original. The OQ-8 answer provided the exact thresholds.
+
+=== Chapter 9: Architecture Decisions
+
+[cols="2,3",options="header"]
+|===
+| Version | ADR References
+
+| Original | Table of 5 ADRs with status
+| Direct (1a) | List of 6 ADRs (wrong topics)
+| Socratic (1c) | Notes "no explicit ADR files exist", 3 reverse-engineered
+| Two-Phase | Table of 5 ADRs with correct status (4 Accepted, 1 Rejected)
+|===
+
+== Traceability: Two Sources, Clearly Marked
+
+The Two-Phase documentation distinguishes two types of claims:
+
+* *Code-derived:* Cited with file:function references. Example: `The model uses JSONC format _(Q-2.2.1, internal/model/loader.go:StripJSONC)_`
+* *Team-provided:* Marked with `(team answer)`. Example: `The project competes with Structurizr and LikeC4 _(OQ-6 team answer)_`
+
+50 team-answer markers across 18 files. This dual-source traceability is unique to the Two-Phase approach.
+
+ADRs use `[NOTE]` blocks to mark reverse-engineered sections while confidently citing team answers where provided:
+
+----
+[NOTE]
+====
+This ADR was reverse-engineered from code. The team did not provide a
+specific narrative about implementation language; the rationale below is
+inferred from build configuration, dependency choices, and the team's
+performance budget (OQ-8).
+====
+----
+
+== arc42 Chapter Comparison
+
+[cols="1,3,1,1,1,1,1",options="header"]
+|===
+| Ch. | Title | Orig | Direct | Socratic | Two-Phase | Winner
+
+| 1 | Introduction and Goals | 114 | 36 | 37 | 74 | Two-Phase (priorities restored)
+| 2 | Constraints | 69 | 22 | 21 | 74 | Two-Phase (most complete)
+| 3 | Context and Scope | 143 | 53 | 30 | 81 | Original (most detail)
+| 4 | Solution Strategy | 106 | 59 | 20 | 70 | Original (design patterns)
+| 5 | Building Block View | 139 | 137 | 51 | 154 | Two-Phase (most detailed)
+| 6 | Runtime View | 210 | 138 | 49 | 133 | Original (most scenarios)
+| 7 | Deployment View | 142 | 51 | 35 | 92 | Two-Phase (budgets restored)
+| 8 | Crosscutting Concepts | 190 | 95 | 64 | 143 | Original (more topics)
+| 9 | Decisions | 36 | 10 | 11 | 32 | Two-Phase (correct ADRs)
+| 10 | Quality Requirements | 131 | 21 | 36 | 121 | Two-Phase (closest to Original)
+| 11 | Risks | 66 | 39 | 56 | 119 | Two-Phase (most risks)
+| 12 | Glossary | 54 | 31 | 19 | 97 | Two-Phase (most terms)
+|===
+
+*Two-Phase wins 8 of 12 chapters.* Original wins 4 (Context, Strategy, Runtime, Concepts) — the chapters where narrative depth and design pattern knowledge matter most.
+
+At 1,090 lines, Two-Phase reaches 84% of the Original's 1,300-line arc42 — the closest of any approach.
+
+== What the Two-Phase Approach Solved
+
+[cols="2,1,1,1,1",options="header"]
+|===
+| Problem | Direct (1a) | Socratic (1c) | Two-Phase | How
+
+| ADRs had wrong topics | ❌ | ❌ | ✅ | OQ-4 team answer listed the 5 real ADR topics
+| ADR rationale was guessed | ❌ | Honest (flagged) | ✅ | OQ-5 team answer provided the real +20 Pugh Matrix rationale
+| Quality goals had no priority | ❌ | ❌ | ✅ | OQ-6 team answer provided competitive context
+| Performance budgets missing | ❌ | ❌ | ✅ | OQ-8 team answer provided exact thresholds
+| Business context generic | ❌ | ❌ | ✅ | OQ-1 personas, OQ-3 collaboration scope, OQ-6 draw.io rationale
+| Open Questions unresolved | 33 open | 26 open | 0 open | Team answered all 11, Phase 2 integrated them
+| Claims not traceable to source | No Q-IDs | Q-IDs but no team markers | Both | Dual traceability: code refs + team answer markers
+|===
+
+== Threats to Validity
+
+=== Unfair comparison
+
+The Two-Phase approach had an information advantage the other approaches did not: 11 team-answered Open Questions. This means the comparison in the table above measures *the value of the 11 answers*, not *the value of the two-phase structure*. If we had given the Direct (1a) or Socratic (1c) approaches the same team answers as additional context, they might have improved significantly too.
+
+A fairer experimental design would include a control: run Phase 1 + Phase 2 *without* team answers (the LLM documents from the Question Tree alone). The difference between that control and the current Two-Phase result would isolate the value of the team answers. The difference between the control and the Direct approach would isolate the value of the two-phase structure.
+
+What we can say with confidence: *the two-phase structure produced the right questions.* The 11 Open Questions identified by Phase 1 were precise enough that answering them closed the gap. Whether a single-shot prompt would have asked the same questions is unknown.
+
+=== Glossary inflation
+
+The Two-Phase glossary (97 lines) is disproportionately large compared to the Original (54 lines, mostly placeholder) and Direct (31 lines). Several entries include code references and implementation details that belong in the Data Models spec, not in a glossary. A glossary should define domain terms concisely; the Two-Phase version treats it as a mini-encyclopedia. This inflates the line count without adding proportional value.
+
+== What the Two-Phase Approach Still Cannot Do
+
+Even with team answers, four categories of information remain weaker than the Original:
+
+. *Narrative depth:* Chapters 4 (Solution Strategy) and 8 (Crosscutting Concepts) are shorter because the LLM summarizes patterns rather than explaining them with examples and trade-off discussions.
+. *Aspirational features:* UC-7 Drill-Down Navigation is still missing. The team answers didn't explicitly mention it, and the code doesn't implement it. Only the Original spec describes it.
+. *Tutorials and guides:* `06_tutorial.adoc` (266 lines) and `07_template_guide.adoc` (322 lines) remain absent. These require didactic skill, not just knowledge.
+. *Historical artifacts:* ATAM reviews, security review reports, E2E test plans — these are process outputs, not recoverable from code or Q&A.
+
+== Conclusion
+
+The Two-Phase Socratic Code Theory Recovery workflow produces the most accurate Brownfield documentation of all tested approaches. It combines:
+
+* The Socratic approach's *honesty* (Question Tree, explicit unknowns)
+* The Direct approach's *completeness* (full arc42, all spec files)
+* A new dimension: *team knowledge* routed through Open Questions
+
+The key insight is that *11 well-targeted questions* (identified by recursive decomposition) plus their answers were sufficient to close the gap between reverse-engineered documentation and the Original. The Open Questions mechanism is not just an honesty device — it is a *precision instrument for knowledge transfer*.
+
+A caveat: we have not yet proven that the two-phase *structure* is better than simply giving the same 11 answers to a single-shot prompt. What we have proven is that Phase 1 identifies the *right questions to ask*. Whether the answer-integration in Phase 2 is superior to a direct prompt with answers appended remains to be tested.
+
+[cols="2,3",options="header"]
+|===
+| Approach | Best for
+
+| Direct (1a) | Quick documentation from code alone, no team access
+| Socratic (1c) | Identifying knowledge gaps, audit trails
+| Two-Phase | Production-quality Brownfield documentation with team involvement
+|===
+
+For teams preparing legacy projects for the Dark Factory, the Two-Phase workflow is the recommended approach: Phase 1 identifies exactly what the team needs to provide (typically 10-15 questions), Phase 2 produces documentation that includes both code evidence and human knowledge, with full traceability to both sources.

@@ -18,14 +18,18 @@ The experiment validates *Socratic Code Theory Recovery* -- a two-phase workflow
 
 ----
 src/docs/
-├── report.adoc              # Consolidated experiment report
-├── semantic-diff.html        # Interactive semantic traceability matrix
+├── report.adoc                       # Consolidated report (all findings)
+├── experiment-1a-direct.adoc         # Detailed: Direct approach
+├── experiment-1c-socratic.adoc       # Detailed: Socratic approach
+├── experiment-2-twophase.adoc        # Detailed: Two-Phase approach
+├── experiment-fair-comparison.adoc   # Detailed: Fair comparison (all with team answers)
+├── semantic-diff.html                # Interactive semantic traceability matrix
 └── prompts/
-    ├── 01-direct.md          # Approach A: Template-based (69 lines)
-    ├── 02-socratic.md        # Approach B: Socratic question refinement (97 lines)
-    ├── 03-twophase-p1.md     # Approach C Phase 1: Build Question Tree (51 lines)
-    ├── 04-twophase-p2.md     # Approach C Phase 2: Synthesize with team answers (61 lines)
-    └── 05-reconcile.md       # Spec drift detection prompt
+    ├── 01-direct.md                  # Approach A: Template-based (69 lines)
+    ├── 02-socratic.md                # Approach B: Socratic question refinement (97 lines)
+    ├── 03-twophase-p1.md             # Approach C Phase 1: Build Question Tree (51 lines)
+    ├── 04-twophase-p2.md             # Approach C Phase 2: Synthesize with team answers (61 lines)
+    └── 05-reconcile.md               # Spec drift detection prompt
 ----
 
 == Subject Project
