@@ -1,0 +1,241 @@
+= Socratic Code Theory Recovery: Experiment Report
+Ralf D. Müller
+2026-05-02
+:toc: left
+:toclevels: 3
+:sectnums:
+:icons: font
+
+== Background
+
+The Spec-Driven Development workflow has demonstrated that LLMs can generate maintainable code from specifications. The documentation artifacts produced in this workflow (PRD, Specification, arc42) appear to capture what Peter Naur described as the "theory" of a program <<naur85>> -- the mental model that, according to Naur, cannot be fully documented. Whether or not Naur was right about human programmers, the Spec-Driven workflow shows that for LLM-generated code, this theory CAN be externalized in structured documentation.
+
+== Research Question
+
+The open question is Brownfield. Legacy software typically has no specification, few tests, and insufficient architecture documentation. Can an LLM extract the necessary documentation from legacy code and thus enable further development using the Spec-Driven workflow?
+
+Answering this directly by applying an LLM to real legacy software is difficult: the quality of the generated documentation is hard to assess without a ground truth to compare against.
+
+=== The Trick
+
+We take an LLM-generated Greenfield project where we can assume that Spec, Tests, and arc42 documentation are of high quality. We transform it into a simulated legacy project by deleting this documentation, then ask an LLM to reconstruct it from the code alone. Because the original Greenfield documentation exists, we can objectively assess the quality of the generated output by comparing the two.
+
+Since we know in advance that not everything can be extracted from code (decisions, rationale, business context), we instruct the LLM to maintain a list of Open Questions. This reveals precisely which information is genuinely missing -- and what a Brownfield project would need to provide before an LLM can work on it productively.
+
+Because the experiment is reproducible (same code, same prompt, deterministic comparison), the extraction prompt can be improved step by step.
+
+== Subject Project
+
+*Bausteinsicht* -- an architecture-as-code CLI tool providing bidirectional synchronization between a JSONC architecture model and draw.io diagrams.
+
+* *Language:* Go (~13,000 lines of code)
+* *Tests:* 39 test files, ~400 tests (unit, integration, property-based, benchmarks)
+* *Original documentation:* 47 files, ~13,800 lines (PRD, 8 Use Cases, 5 ADRs, 12 arc42 chapters, tutorials, security review, E2E test plan)
+* *Repository:* https://github.com/docToolchain/Bausteinsicht
+
+The original documentation was not human-written. It was LLM-generated following the Spec-Driven Development workflow from a requirements conversation.
+
+== Three Approaches Tested
+
+We tested three approaches, each with a different prompt structure. All used the same branch preparation: `src/docs/` and `CLAUDE.md` deleted, tests and code intact.
+
+=== Approach A: Direct (Template-Based)
+
+A 69-line prompt listing the artifacts to produce (PRD, Spec, arc42, Open Questions) with Semantic Anchors ("Cockburn", "arc42", "Nygard ADR", "Pugh Matrix") instead of format definitions.
+
+*Process:* Single prompt, single pass. The LLM reads code and writes documentation.
+
+=== Approach B: Socratic Code Theory Recovery
+
+A 97-line prompt with 5 starting questions, recursively decomposed using Semantic Anchors as decomposition guides. Each leaf is either `[ANSWERED]` with code evidence or `[OPEN]` with Category and Ask role.
+
+*Process:* Single prompt, but two-phase output -- Question Tree first, then documentation synthesized from answered leaves.
+
+=== Approach C: Two-Phase with Team Answers
+
+Phase 1: Socratic prompt builds the Question Tree and produces an Open Questions handoff document. Phase 2: Team answers the Open Questions. A second prompt synthesizes documentation from code evidence + team answers, with Q-ID traceability.
+
+*Process:* Two prompts with human-in-the-loop between them. 11 Open Questions answered by the team.
+
+=== Fair Comparison
+
+To make the comparison fair, we ran follow-up prompts on Approaches A and B, providing the same team answers. All three approaches have identical information. The comparison below measures the value of the *structure*, not the value of the answers.
+
+== Semantic Traceability Matrix
+
+We compare by *semantic content*, not filenames or text. 30 facts extracted from the original documentation, checked against each approach.
+
+=== Design Decisions (5 original ADRs)
+
+[cols="3,1,1,1",options="header"]
+|===
+| Decision | Direct | Socratic | Two-Phase
+
+| Use JSONC as DSL (6 alternatives, Pugh +20) | ✅ | ✅ | ✅
+| Use Go as implementation language (vs Python, Kotlin) | ⚠️ No ADR | ❌ | ✅
+| Risk Classification via Vibe-Coding Risk Radar | ❌ | ❌ | ✅
+| Reject sequence diagram export | ❌ | ❌ | ✅
+| Bespoke layered layout engine (vs Graphviz, dagre) | ✅ | ❌ | ✅
+|===
+
+*Two-Phase matched all 5 original ADR topics.* Direct matched 2/5 and invented 5 new ones. Socratic matched 1/5.
+
+The Question Tree made the difference: Phase 1 asked "which ADRs exist?" (OQ-4), the team answered with the 5 topics, and Phase 2 wrote ADRs for those exact topics.
+
+=== Quality Goals (priority order matters)
+
+[cols="3,1,1,1",options="header"]
+|===
+| Goal (Original Priority) | Direct | Socratic | Two-Phase
+
+| #1 Learnability (30-min onboarding) | ❌ Not listed | ✅ | ⚠️ Different framing
+| #2 IDE Support (JSON Schema) | ⚠️ NFR only | ✅ | ⚠️ Not priority #2
+| #3 LLM Friendliness | ⚠️ Priority #5 | ✅ | ⚠️ Priority #2
+|===
+
+*Socratic is the only version with correct quality goal priorities.* All three received the same team answers, but only Socratic's Question Tree decomposition led to the correct ordering.
+
+=== Functional Requirements, Use Cases, Performance, Security
+
+[cols="3,1,1,1",options="header"]
+|===
+| Category | Direct | Socratic | Two-Phase
+
+| Functional Requirements (7 original) | ✅ 7/7 (most granular) | ⚠️ 5.5/7 | ⚠️ 6.5/7
+| Use Cases (8 original) | 5/8 + 4 new | 5/8 + 5 new | 5/8 + 5 new
+| Performance Budgets (4 metrics) | ✅ 4/4 | ✅ 4/4 | ✅ 4/4
+| Trust Model (3 boundaries) | ✅ 3/3 | ✅ 3/3 | ✅ 3/3
+|===
+
+Performance budgets and trust model are universally well-recovered (all from team answers). All three versions merge forward/reverse sync into one UC and add new UCs discovered from code (Validate, CLI Add, Export Table/Diagrams).
+
+=== Overall Scores
+
+[cols="2,1,1,1",options="header"]
+|===
+| | Direct | Socratic | Two-Phase
+
+| ✅ Correct | 14 | 15 | 19
+| ⚠️ Partial | 7 | 7 | 6
+| ❌ Missing | 9 | 8 | 5
+| *Score (✅+½⚠️)* | *17.5/30* | *18.5/30* | *22/30*
+|===
+
+== What LLMs Can and Cannot Recover from Code
+
+[cols="2,3",options="header"]
+|===
+| Derivable from code | NOT derivable from code
+
+| Functional requirements (WHAT) | Business context (WHY, AGAINST WHOM)
+| Data models and interfaces | Design rationale (WHY alternative A over B)
+| CLI specification | Quality goal *priorities*
+| Acceptance criteria (from tests) | Stakeholder concerns and skill levels
+| Building block view (package structure) | Aspirational features (planned, not implemented)
+| Glossary (domain terms from structs) | Performance budgets (thresholds, not benchmarks)
+| Security mechanisms (SEC codes, validation) | Tutorials and guides
+| Crosscutting concepts | Review results (historical)
+|===
+
+== Where Generated Documentation is Better than the Original
+
+In five areas, the LLM produced substantively better documentation than the original (which was also LLM-generated from a requirements conversation):
+
+. *Security:* Integrated SEC-IDs (SEC-001..018) traceable through PRD, CLI spec, and acceptance criteria. The original PRD had zero security NFRs; the code had six security mechanisms.
+. *Acceptance Criteria:* Test function names cited inline, making each criterion directly verifiable. The original Gherkin scenarios had no connection to actual tests.
+. *Sync Algorithm:* Formalized as a truth table (M==S / D==S combinations) with 12 structured edge cases. The original used prose.
+. *Building Block View:* Active, verb-first responsibility statements with explicit API contracts. The original used passive descriptions.
+. *NFRs:* Found 12 (vs. 4 in original) including security constraints, robustness bounds, and quality gates that were implemented but never documented.
+
+=== Root Cause: Spec Drift
+
+All five areas share the same root cause: the spec was generated from a requirements conversation before implementation, and the code evolved beyond it. Security hardening, validation rules, edge cases, and performance tooling were added during development but never reflected back into the spec.
+
+This means spec drift is not a discipline problem. It is a structural property of the workflow: the implementation LLM discovers requirements that the specification LLM could not anticipate.
+
+== Implications for Semantic Anchors
+
+=== Prompt Compression (validated)
+
+The anchored prompt (69 lines) produced 3,850 lines of correctly structured documentation. The terms "Cockburn", "arc42", "Nygard ADR" triggered the full methodology from training data. A systematic literature review <<slr25>> found no prior study examining this compression effect.
+
+=== Decomposition Heuristics (new finding)
+
+The Socratic experiment revealed a second use: Semantic Anchors guide MECE question decomposition. "arc42" immediately generates 12 sub-questions. "ISO 25010" generates 8 quality categories. The anchors carry enough structure to drive the Question Tree without additional instructions.
+
+=== Strong Anchors Need No Examples
+
+Strong anchors (arc42, Cockburn, Nygard ADR) carry their definition in the LLM's training data. A few-shot example would be redundant. Custom formats (Open Questions template, Reconciliation Report) have no anchor in training data and benefit from a single example entry.
+
+=== Connection to Eichhorst's Principle
+
+The documentation that an LLM cannot derive from code is exactly the channel capacity that must be transmitted (Shannon). Business context and design rationale are the signal. Code is not a channel for this signal -- code is the output, not the decision.
+
+The Brownfield Preparation Checklist defines the minimum information that must travel through the documentation channel. Below this threshold, the LLM operates with insufficient channel capacity and the error rate climbs as Eichhorst's Principle predicts.
+
+== Recommended Workflow: Socratic Code Theory Recovery
+
+Based on the experiments, the recommended workflow for preparing Brownfield projects:
+
+----
+Phase 0: Scope bounded contexts (Martinelli / DDD)
+Phase 1: Socratic Code Theory Recovery (Question Tree)
+         -> Open Questions handoff to team
+Phase 2: Team answers (typically 10-15 questions, routed by role)
+Phase 3: Synthesize documentation (Q-ID traceability + team answer markers)
+Phase 4: Establish baseline tests from synthesized Use Cases
+Phase 5: Continue with standard Spec-Driven Development workflow
+----
+
+The Brownfield Preparation Checklist (minimum for Phase 2):
+
+. A *Problem Statement* with competitive context (1 page)
+. *ADR context sections* for the top 5 decisions (1 paragraph "why" each)
+. *Prioritized Quality Goals* (top 3 with rationale)
+. *Stakeholder profiles* (who uses it, what they can do, what they expect)
+. A *"Not Implemented Yet" list* (planned features)
+. *Performance budgets* (measurable thresholds)
+
+Everything else the LLM can reconstruct on its own.
+
+=== Spec Reconciliation
+
+The workflow becomes a loop. After implementation, run the reverse-engineering prompt against current code and diff against the existing spec. Three trigger points: before a release, after a security review, before onboarding.
+
+----
+Spec (WHY) -> Code (LLM) -> Reconcile (WHAT changed?) -> Update Spec -> ...
+----
+
+== Threats to Validity
+
+=== No static analysis
+
+ArchAgent <<archagent26>> achieves F1=0.966 by combining static analysis with LLM synthesis. Our experiment uses a pure LLM approach. Pre-computed dependency graphs or AST summaries could improve Building Block View and Runtime View.
+
+=== Zero-shot for custom formats
+
+Strong Semantic Anchors (arc42, Cockburn) need no examples. Custom formats (Open Questions template, Reconciliation Report) would benefit from a single example entry <<cabrera26>>, <<userstories25>>.
+
+=== Git history blocked
+
+We block `git log` and `git blame` because commit messages reference specification IDs. However, commit messages also contain design rationale <<sdd26>>. Selectively filtering rather than fully blocking could improve ADR reconstruction.
+
+=== Single LLM, single run
+
+All experiments used Claude in one session each. Multi-model comparison and repeated runs would strengthen the findings.
+
+=== Only one project
+
+Bausteinsicht is a well-structured Go CLI tool. Results may differ for projects with less clean architecture, fewer tests, or dynamic languages.
+
+[bibliography]
+== References
+
+- [[[naur85]]] Peter Naur. "Programming as Theory Building." Microprocessing and Microprogramming, 15(5):253-261, 1985. Argues that programming is about building a "theory" that cannot be fully captured in documentation. Our experiment tests this claim in the context of LLM-generated code.
+- [[[cabrera26]]] Cabrera et al. "LLM-based Automated Architecture View Generation: Where Are We Now?" arXiv:2603.21178, March 2026. 340 repos, 4,137 generated views. LLMs "consistently exhibit granularity mismatches." https://arxiv.org/abs/2603.21178
+- [[[garcia24]]] Dhar, Vaidhyanathan, Varma. "Can LLMs Generate Architectural Design Decisions? -- An Exploratory Empirical study." arXiv:2403.01709, ICSA 2024. LLMs can generate ADR decisions given context, but not reconstruct both from code. https://arxiv.org/abs/2403.01709
+- [[[ecsa25]]] "Automated Software Architecture Design Recovery from Source Code Using LLMs." ECSA 2025. LLMs "struggle with complex abstractions such as class relationships and fine-grained design patterns."
+- [[[archagent26]]] "ArchAgent: Scalable Legacy Software Architecture Recovery with LLMs." arXiv:2601.13007, January 2026. F1=0.966 for structural recovery using static analysis + LLM. https://arxiv.org/abs/2601.13007
+- [[[slr25]]] Schmid et al. "Software Architecture Meets LLMs: A Systematic Literature Review." arXiv:2505.16697, May 2025. 18 papers analyzed. Full arc42 reverse-engineering not covered. https://arxiv.org/abs/2505.16697
+- [[[sdd26]]] Piskala. "Spec-Driven Development: From Code to Contract in the Age of AI Coding Assistants." arXiv:2602.00180, February 2026. Defines spec drift and proposes spec-first workflows. https://arxiv.org/abs/2602.00180
+- [[[userstories25]]] Ouf et al. "Reverse Engineering User Stories from Code using Large Language Models." arXiv:2509.19587, September 2025. F1=0.8 for user story recovery. "A single example lets an 8B model match 70B performance." https://arxiv.org/abs/2509.19587

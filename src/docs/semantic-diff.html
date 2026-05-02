@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Brownfield Experiment: Semantic Traceability Matrix</title>
+<style>
+body { font-family: -apple-system, sans-serif; max-width: 1200px; margin: 40px auto; padding: 0 20px; line-height: 1.6; color: #333; }
+h1 { border-bottom: 2px solid #2563eb; padding-bottom: 8px; }
+h2 { color: #1e40af; margin-top: 2em; cursor: pointer; }
+h2:hover { text-decoration: underline; }
+h3 { color: #374151; }
+table { border-collapse: collapse; width: 100%; margin: 1em 0; }
+th, td { border: 1px solid #d1d5db; padding: 8px 12px; text-align: left; vertical-align: top; }
+th { background: #f3f4f6; font-weight: 600; position: sticky; top: 0; }
+tr:nth-child(even) { background: #f9fafb; }
+.pass { background: #d1fae5; }
+.partial { background: #fef3c7; }
+.fail { background: #fee2e2; }
+.new { background: #dbeafe; }
+.legend { display: flex; gap: 16px; margin: 10px 0; flex-wrap: wrap; }
+.legend span { padding: 4px 12px; border-radius: 4px; font-size: 13px; }
+.summary-bar { display: flex; gap: 2px; height: 24px; margin: 8px 0; border-radius: 4px; overflow: hidden; }
+.summary-bar div { display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: #333; }
+.score { font-size: 24px; font-weight: 700; }
+.score-label { font-size: 12px; color: #666; }
+.score-card { text-align: center; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; }
+.scores { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 20px 0; }
+.collapsible { display: none; }
+.collapsible.open { display: block; }
+details { margin: 8px 0; }
+details summary { cursor: pointer; font-weight: 500; padding: 4px 0; }
+.note { font-size: 13px; color: #666; font-style: italic; }
+</style>
+</head>
+<body>
+
+<h1>Semantic Traceability Matrix</h1>
+<p>Comparing three reverse-engineering approaches against the original documentation. Matching by <strong>semantic content</strong>, not filenames or IDs. All versions include team-answered Open Questions.</p>
+
+<div class="legend">
+  <span class="pass">✅ Present + correct</span>
+  <span class="partial">⚠️ Partial / imprecise</span>
+  <span class="fail">❌ Missing</span>
+  <span class="new">🆕 New (not in original)</span>
+</div>
+
+<div class="scores">
+  <div class="score-card">
+    <div class="score-label">Direct (1a)</div>
+    <div class="score">21/30</div>
+    <div class="summary-bar">
+      <div class="pass" style="flex:14">14</div>
+      <div class="partial" style="flex:7">7</div>
+      <div class="fail" style="flex:9">9</div>
+    </div>
+  </div>
+  <div class="score-card">
+    <div class="score-label">Socratic (1c)</div>
+    <div class="score">22/30</div>
+    <div class="summary-bar">
+      <div class="pass" style="flex:15">15</div>
+      <div class="partial" style="flex:7">7</div>
+      <div class="fail" style="flex:8">8</div>
+    </div>
+  </div>
+  <div class="score-card">
+    <div class="score-label">Two-Phase</div>
+    <div class="score">25/30</div>
+    <div class="summary-bar">
+      <div class="pass" style="flex:19">19</div>
+      <div class="partial" style="flex:6">6</div>
+      <div class="fail" style="flex:5">5</div>
+    </div>
+  </div>
+</div>
+
+<h2 onclick="toggle('cat1')">1. Design Decisions (5 original ADRs)</h2>
+<div id="cat1" class="collapsible open">
+<table>
+<tr><th style="width:25%">Decision</th><th style="width:25%">Direct</th><th style="width:25%">Socratic</th><th style="width:25%">Two-Phase</th></tr>
+<tr>
+  <td><strong>Use JSONC as DSL</strong><br><span class="note">6 alternatives, Pugh +20</span></td>
+  <td class="pass">✅ Decision + rationale + all 6 alternatives + Pugh matrix</td>
+  <td class="pass">✅ Decision + rationale + Pugh matrix. Confirmed via team answer.</td>
+  <td class="pass">✅ Decision + rationale + 6 alternatives + Pugh matrix + code refs</td>
+</tr>
+<tr>
+  <td><strong>Use Go as language</strong><br><span class="note">vs Python, Kotlin/JVM</span></td>
+  <td class="partial">⚠️ Go mentioned in PRD/NFR but no ADR. ADR-002 is about Cobra CLI instead.</td>
+  <td class="fail">❌ No ADR about implementation language. Go mentioned but no alternatives evaluated.</td>
+  <td class="pass">✅ ADR with 5 alternatives (Go, Rust, Node TS, GraalVM, Python) + Pugh matrix</td>
+</tr>
+<tr>
+  <td><strong>Risk Classification via Vibe-Coding Risk Radar</strong><br><span class="note">Tier 2 assessment</span></td>
+  <td class="fail">❌ Not documented. ADR-003 is about three-way diff instead.</td>
+  <td class="fail">❌ Not documented.</td>
+  <td class="pass">✅ ADR documents Risk Radar adoption with Pugh matrix</td>
+</tr>
+<tr>
+  <td><strong>Reject sequence diagram export</strong><br><span class="note">4 approaches evaluated, all rejected</span></td>
+  <td class="fail">❌ Not documented.</td>
+  <td class="fail">❌ Not documented.</td>
+  <td class="pass">✅ ADR marked as Rejected. 3 alternatives + Pugh matrix.</td>
+</tr>
+<tr>
+  <td><strong>Bespoke layered layout engine</strong><br><span class="note">vs Graphviz, dagre, force-directed</span></td>
+  <td class="pass">✅ Documented as ADR-007. Pugh matrix, 3 modes, static-binary rationale.</td>
+  <td class="fail">❌ Layout mentioned in sync spec but no ADR.</td>
+  <td class="pass">✅ ADR with 4 alternatives + Pugh matrix</td>
+</tr>
+</table>
+<details><summary>New decisions invented by generated versions</summary>
+<table>
+<tr><th>Version</th><th>Decision</th><th>In Original?</th></tr>
+<tr><td>Direct</td><td>Cobra CLI framework</td><td class="new">🆕 No</td></tr>
+<tr><td>Direct</td><td>Three-way diff sync strategy</td><td class="new">🆕 No</td></tr>
+<tr><td>Direct</td><td>Model-wins conflict policy</td><td class="new">🆕 No</td></tr>
+<tr><td>Direct</td><td>etree XML library</td><td class="new">🆕 No</td></tr>
+<tr><td>Direct</td><td>Embedded templates (go:embed)</td><td class="new">🆕 No</td></tr>
+<tr><td>Socratic</td><td>Model-wins conflict policy</td><td class="new">🆕 No</td></tr>
+<tr><td>Socratic</td><td>Pure sync function architecture</td><td class="new">🆕 No</td></tr>
+</table>
+</details>
+</div>
+
+<h2 onclick="toggle('cat2')">2. Functional Requirements (7 original FRs)</h2>
+<div id="cat2" class="collapsible">
+<table>
+<tr><th style="width:25%">Requirement</th><th style="width:25%">Direct</th><th style="width:25%">Socratic</th><th style="width:25%">Two-Phase</th></tr>
+<tr><td><strong>FR-1: Model Definition</strong><br><span class="note">JSONC, elements, relationships, nesting</span></td><td class="pass">✅ Extensive (FR-001..006)</td><td class="pass">✅</td><td class="pass">✅</td></tr>
+<tr><td><strong>FR-2: draw.io Generation</strong></td><td class="pass">✅</td><td class="pass">✅</td><td class="pass">✅</td></tr>
+<tr><td><strong>FR-3: Bidirectional Sync</strong></td><td class="pass">✅ Extensive</td><td class="pass">✅</td><td class="pass">✅</td></tr>
+<tr><td><strong>FR-4: Relationship Handling</strong><br><span class="note">center attachment, label sync</span></td><td class="pass">✅</td><td class="partial">⚠️ Center attachment not explicit</td><td class="partial">⚠️ Center attachment not explicit</td></tr>
+<tr><td><strong>FR-5: Navigation / Drill-Down</strong></td><td class="pass">✅ In ACs</td><td class="pass">✅ In PRD + concepts</td><td class="pass">✅ In PRD + sync spec</td></tr>
+<tr><td><strong>FR-6: CLI Interface</strong></td><td class="pass">✅ Most detailed</td><td class="pass">✅</td><td class="pass">✅</td></tr>
+<tr><td><strong>FR-7: Template System</strong></td><td class="pass">✅</td><td class="partial">⚠️ Partial</td><td class="pass">✅</td></tr>
+</table>
+</div>
+
+<h2 onclick="toggle('cat3')">3. Quality Goals (3 goals, priority order matters)</h2>
+<div id="cat3" class="collapsible">
+<table>
+<tr><th style="width:25%">Goal (Original Priority)</th><th style="width:25%">Direct</th><th style="width:25%">Socratic</th><th style="width:25%">Two-Phase</th></tr>
+<tr><td><strong>#1 Learnability</strong><br><span class="note">productive in 30 min</span></td><td class="fail">❌ Not in quality goals. Listed as 6 different priorities.</td><td class="pass">✅ Priority #1, "productive in 30 minutes"</td><td class="partial">⚠️ Listed as "zero-friction install" (#3), not as #1</td></tr>
+<tr><td><strong>#2 IDE Support</strong><br><span class="note">JSON Schema, no plugins</span></td><td class="partial">⚠️ NFR-010 but not a quality goal</td><td class="pass">✅ Priority #2</td><td class="partial">⚠️ Mentioned but not priority #2</td></tr>
+<tr><td><strong>#3 LLM Friendliness</strong><br><span class="note">JSON readable by AI</span></td><td class="partial">⚠️ Listed as priority #5 (not #3)</td><td class="pass">✅ Priority #3</td><td class="partial">⚠️ Priority #2 as "LLM predictability" (different framing)</td></tr>
+</table>
+<p class="note">Only Socratic correctly reproduces all three goals with the correct priority order. This is surprising — the team answers included the same information for all three versions, but only Socratic's Question Tree decomposition led to the correct priorities.</p>
+</div>
+
+<h2 onclick="toggle('cat4')">4. Use Cases (8 original UCs)</h2>
+<div id="cat4" class="collapsible">
+<table>
+<tr><th style="width:25%">Use Case</th><th style="width:25%">Direct</th><th style="width:25%">Socratic</th><th style="width:25%">Two-Phase</th></tr>
+<tr><td><strong>Init Architecture Model</strong></td><td class="pass">✅</td><td class="pass">✅</td><td class="pass">✅</td></tr>
+<tr><td><strong>Define Elements (manual IDE)</strong></td><td class="partial">⚠️ Only CLI add, not manual editing</td><td class="fail">❌</td><td class="fail">❌</td></tr>
+<tr><td><strong>Forward Sync</strong></td><td class="pass">✅ Combined with reverse</td><td class="pass">✅ Combined</td><td class="pass">✅ Combined</td></tr>
+<tr><td><strong>Reverse Sync</strong></td><td class="pass">✅ Combined with forward</td><td class="pass">✅ Combined</td><td class="pass">✅ Combined</td></tr>
+<tr><td><strong>Watch Mode</strong></td><td class="pass">✅</td><td class="pass">✅</td><td class="pass">✅</td></tr>
+<tr><td><strong>LLM-Driven Modification</strong></td><td class="partial">⚠️ Implicit (LLM as actor)</td><td class="partial">⚠️ Implicit</td><td class="partial">⚠️ Implicit</td></tr>
+<tr><td><strong>Drill-Down Navigation</strong></td><td class="partial">⚠️ In ACs, not standalone UC</td><td class="partial">⚠️ In concepts, not standalone UC</td><td class="partial">⚠️ In spec, not standalone UC</td></tr>
+<tr><td><strong>Export Diagram Views</strong></td><td class="pass">✅</td><td class="pass">✅</td><td class="pass">✅</td></tr>
+</table>
+<details><summary>New use cases discovered from code</summary>
+<p>All three versions independently discovered the same additional use cases: <strong>Validate</strong>, <strong>Add Element via CLI</strong>, <strong>Add Relationship via CLI</strong>, <strong>Export Tables</strong>, <strong>Export Text Diagrams</strong>. These exist in the code but are not in the original spec.</p>
+</details>
+</div>
+
+<h2 onclick="toggle('cat5')">5. Performance Budgets (4 metrics)</h2>
+<div id="cat5" class="collapsible">
+<table>
+<tr><th>Metric</th><th>Direct</th><th>Socratic</th><th>Two-Phase</th></tr>
+<tr><td><strong>Startup &lt;10ms</strong></td><td class="pass">✅</td><td class="pass">✅</td><td class="pass">✅</td></tr>
+<tr><td><strong>Sync &lt;100ms (200 elements)</strong></td><td class="pass">✅</td><td class="pass">✅</td><td class="pass">✅</td></tr>
+<tr><td><strong>Binary 10-15 MB</strong></td><td class="pass">✅</td><td class="pass">✅</td><td class="pass">✅</td></tr>
+<tr><td><strong>Zero dependencies</strong></td><td class="pass">✅</td><td class="pass">✅</td><td class="pass">✅</td></tr>
+</table>
+<p class="note">All versions got all 4 metrics exactly right. These came from team answers (OQ-050 / OQ-8 / Q-3.10.2).</p>
+</div>
+
+<h2 onclick="toggle('cat6')">6. Security / Trust Model (3 boundaries)</h2>
+<div id="cat6" class="collapsible">
+<table>
+<tr><th>Boundary</th><th>Direct</th><th>Socratic</th><th>Two-Phase</th></tr>
+<tr><td><strong>Fully Trusted: CLI Flags</strong></td><td class="pass">✅</td><td class="pass">✅</td><td class="pass">✅</td></tr>
+<tr><td><strong>Semi-Trusted: Model/Template Files</strong></td><td class="pass">✅ Most detail (size, depth, checksum)</td><td class="pass">✅</td><td class="pass">✅</td></tr>
+<tr><td><strong>Untrusted: Agent/CI</strong></td><td class="pass">✅</td><td class="pass">✅</td><td class="pass">✅</td></tr>
+<tr><td><strong>Non-Threats (no network, no code exec, no credentials)</strong></td><td class="partial">⚠️ Only "no network"</td><td class="partial">⚠️ Only "no network"</td><td class="partial">⚠️ Only "no network"</td></tr>
+</table>
+</div>
+
+<h2 onclick="toggle('cat7')">7. Structural Metrics</h2>
+<div id="cat7" class="collapsible">
+<table>
+<tr><th>Metric</th><th>Original</th><th>Direct</th><th>Socratic</th><th>Two-Phase</th></tr>
+<tr><td>Total doc lines</td><td>~13,800</td><td>3,886</td><td>2,481</td><td>4,083</td></tr>
+<tr><td>ADRs (matching original topics)</td><td>5</td><td>2/5 (+5 new)</td><td>1/5 (+2 new)</td><td><strong>5/5</strong></td></tr>
+<tr><td>Team answer markers</td><td>0</td><td>26</td><td>35</td><td><strong>50</strong></td></tr>
+<tr><td>Q-ID traceability refs</td><td>0</td><td>101</td><td><strong>123</strong></td><td>109</td></tr>
+<tr><td>Open Questions remaining</td><td>—</td><td>0</td><td>0</td><td>0</td></tr>
+</table>
+</div>
+
+<script>
+function toggle(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+</script>
+</body>
+</html>

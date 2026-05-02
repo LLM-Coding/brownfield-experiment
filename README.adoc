@@ -1,0 +1,71 @@
+= Socratic Code Theory Recovery: Brownfield Experiment
+:toc:
+
+== What is this?
+
+A controlled experiment measuring how well LLMs can reverse-engineer software documentation from source code. We deleted all documentation from a well-documented Greenfield project and asked an LLM to reconstruct it, then compared the output against the originals.
+
+The experiment validates *Socratic Code Theory Recovery* -- a two-phase workflow for preparing Brownfield (legacy) projects for AI-assisted development.
+
+== Key Findings
+
+* An LLM can reconstruct functional requirements, acceptance criteria, building block views, and glossaries from code -- often *better* than the original.
+* An LLM *cannot* reconstruct business context, design rationale, quality goal priorities, or aspirational features. These require human input.
+* 11 targeted questions (identified by recursive decomposition) were sufficient to close the gap.
+* Semantic Anchors ("arc42", "Cockburn", "Nygard ADR") work as both prompt compression and decomposition heuristics.
+
+== Repository Structure
+
+----
+src/docs/
+├── report.adoc              # Consolidated experiment report
+├── semantic-diff.html        # Interactive semantic traceability matrix
+└── prompts/
+    ├── 01-direct.md          # Approach A: Template-based (69 lines)
+    ├── 02-socratic.md        # Approach B: Socratic question refinement (97 lines)
+    ├── 03-twophase-p1.md     # Approach C Phase 1: Build Question Tree (51 lines)
+    ├── 04-twophase-p2.md     # Approach C Phase 2: Synthesize with team answers (61 lines)
+    └── 05-reconcile.md       # Spec drift detection prompt
+----
+
+== Subject Project
+
+https://github.com/docToolchain/Bausteinsicht[Bausteinsicht] -- a Go CLI tool for bidirectional sync between JSONC architecture models and draw.io diagrams. ~13,000 lines of code, 39 test files, ~400 tests.
+
+Experiment branches on the Bausteinsicht repo:
+
+* `brownfield` -- Direct approach (docs deleted, tests kept)
+* `brownfield-socratic` -- Socratic approach
+* `brownfield-2-phases` -- Two-Phase approach
+
+== How to Reproduce
+
+. Clone the https://github.com/docToolchain/Bausteinsicht[Bausteinsicht] repo
+. Check out the `brownfield` branch (docs and CLAUDE.md are already deleted)
+. Open a fresh LLM session (Claude, GPT, etc.)
+. Paste one of the prompts from `src/docs/prompts/`
+. Compare the generated `src/docs/` against the `main` branch
+
+For the Two-Phase workflow:
+
+. Use `03-twophase-p1.md` first -- produces `QUESTION_TREE.adoc` and `OPEN_QUESTIONS.adoc`
+. Answer the Open Questions (or use the originals from `main` branch as ground truth)
+. Paste the answers into `04-twophase-p2.md` and run Phase 2
+
+== Building the Report
+
+This repository uses https://doctoolchain.org[docToolchain] to build the AsciiDoc report.
+
+----
+./dtcw generateHTML
+----
+
+== Related Work
+
+* https://llm-coding.github.io/Semantic-Anchors/spec-driven-development[Spec-Driven Development] -- the Greenfield workflow
+* https://llm-coding.github.io/Semantic-Anchors/brownfield[Brownfield Workflow] -- how this experiment fits into the workflow
+* Peter Naur, "Programming as Theory Building" (1985) -- the theoretical foundation
+
+== License
+
+CC-BY-4.0
