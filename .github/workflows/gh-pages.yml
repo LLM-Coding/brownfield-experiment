@@ -33,6 +33,9 @@ jobs:
       - name: Generate Site
         run: ./dtcw generateSite
 
+      - name: Copy static assets
+        run: cp src/docs/semantic-diff.html build/microsite/output/semantic-diff.html
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
